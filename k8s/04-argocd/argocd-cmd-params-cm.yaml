@@ -1,0 +1,8 @@
+# argocd-server sirve HTTP plano, el que recibe el trafico del navegador es Traefik
+# (sin esto argocd-server redirige a HTTPS y se hace un loop de redirecciones)
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-cmd-params-cm
+data:
+  server.insecure: "true"

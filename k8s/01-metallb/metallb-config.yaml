@@ -1,0 +1,20 @@
+# Pool con una sola IP (la que va a usar el LoadBalancer de Traefik)
+# La IP esta dentro de la red de minikube (192.168.49.0/24)
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: pool-parcial
+  namespace: metallb-system
+spec:
+  addresses:
+    - 192.168.49.200/32
+---
+# Anuncia la IP del pool en capa 2 (ARP)
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: l2-parcial
+  namespace: metallb-system
+spec:
+  ipAddressPools:
+    - pool-parcial

@@ -1,0 +1,12 @@
+# Conexion de Argo CD con el repositorio de GitHub
+# El repo es publico, entonces no hace falta usuario ni token
+apiVersion: v1
+kind: Secret
+metadata:
+  name: repo-virtualizacion-tareas
+  labels:
+    argocd.argoproj.io/secret-type: repository
+stringData:
+  type: git
+  name: virtualizacion-tareas
+  url: https://github.com/Chrivill02/virtualizacion-tareas.git

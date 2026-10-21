@@ -1,0 +1,5 @@
+# Namespace de las aplicaciones: "parcial-" + iniciales
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: parcial-cavv

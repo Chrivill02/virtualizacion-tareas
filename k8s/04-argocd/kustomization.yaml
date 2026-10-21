@@ -1,0 +1,24 @@
+# Instala Argo CD con el manifiesto oficial pero en el namespace argocd-cavv
+# Uso: kubectl apply -k k8s/04-argocd --server-side
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Le cambia el namespace a todos los recursos (incluye los subjects de los ClusterRoleBinding)
+namespace: argocd-cavv
+
+resources:
+  - namespace.yaml
+  - https://raw.githubusercontent.com/argoproj/argo-cd/v3.5.5/manifests/install.yaml
+  - ingress.yaml
+  - repo-github.yaml
+
+patches:
+  - path: argocd-cmd-params-cm.yaml
+  # Los ClusterRoleBinding del manifiesto oficial apuntan al namespace "argocd",
+  # kustomize no los cambia solo, hay que parcharlos a mano
+  - target:
+      kind: ClusterRoleBinding
+    patch: |-
+      - op: replace
+        path: /subjects/0/namespace
+        value: argocd-cavv
