@@ -1,0 +1,94 @@
+# Una Application por cada app del namespace parcial-cavv
+# Todas leen la carpeta k8s/03-apps de la rama assessment-06, cada una solo su archivo
+# automated: Argo CD aplica solo los cambios que se suben al repo
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: nginx
+  namespace: argocd-cavv
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/Chrivill02/virtualizacion-tareas.git
+    targetRevision: assessment-06
+    path: k8s/03-apps
+    directory:
+      include: nginx.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: parcial-cavv
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: whoami
+  namespace: argocd-cavv
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/Chrivill02/virtualizacion-tareas.git
+    targetRevision: assessment-06
+    path: k8s/03-apps
+    directory:
+      include: whoami.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: parcial-cavv
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: podinfo
+  namespace: argocd-cavv
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/Chrivill02/virtualizacion-tareas.git
+    targetRevision: assessment-06
+    path: k8s/03-apps
+    directory:
+      include: podinfo.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: parcial-cavv
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: juego2048
+  namespace: argocd-cavv
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/Chrivill02/virtualizacion-tareas.git
+    targetRevision: assessment-06
+    path: k8s/03-apps
+    directory:
+      include: juego2048.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: parcial-cavv
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
