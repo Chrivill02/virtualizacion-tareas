@@ -7,8 +7,8 @@ adminUser: admin
 
 grafana.ini:
   server:
-    domain: grafana.parcial.dominio
-    root_url: http://grafana.parcial.dominio
+    domain: grafana.cavv.dominio
+    root_url: http://grafana.cavv.dominio
   analytics:
     check_for_updates: false
     reporting_enabled: false

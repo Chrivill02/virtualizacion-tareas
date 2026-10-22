@@ -4,9 +4,9 @@
 # salen de cAdvisor, que ya viene en el kubelet (job kubernetes-nodes-cadvisor).
 
 server:
-  # Prometheus escucha en / (Traefik lo expone en prometheus.parcial.dominio)
+  # Prometheus escucha en / (Traefik lo expone en prometheus.cavv.dominio)
   prefixURL: ""
-  baseURL: http://prometheus.parcial.dominio
+  baseURL: http://prometheus.cavv.dominio
 
   global:
     scrape_interval: 30s

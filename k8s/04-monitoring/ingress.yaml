@@ -9,7 +9,7 @@ metadata:
 spec:
   ingressClassName: traefik
   rules:
-    - host: grafana.parcial.dominio
+    - host: grafana.cavv.dominio
       http:
         paths:
           - path: /
@@ -30,7 +30,7 @@ metadata:
 spec:
   ingressClassName: traefik
   rules:
-    - host: prometheus.parcial.dominio
+    - host: prometheus.cavv.dominio
       http:
         paths:
           - path: /
