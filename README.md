@@ -153,9 +153,11 @@ helm upgrade --install prometheus prometheus-community/prometheus --version 29.3
 
 Todos los targets en **Status > Target health** estan UP:
 
-![prometheus targets 1](capturas/prometheus-targets-1.jpg)
+![prometheus targets 1](capturas/prometheus-targets-1.png)
 
-![prometheus targets 2](capturas/prometheus-targets-2.jpg)
+![prometheus targets 2](capturas/prometheus-targets-2.png)
+
+![prometheus targets 3](capturas/prometheus-targets-3.png)
 
 ## 2. Loki
 
@@ -323,47 +325,47 @@ kubectl port-forward -n traefik svc/traefik 80:80
 
 `http://prometheus.cavv.dominio`, pods Running por namespace:
 
-![prometheus](capturas/prometheus-dominio.jpg)
+![prometheus](capturas/prometheus-dominio.png)
 
 ### Grafana por dominio
 
-`http://grafana.cavv.dominio`:
+`http://grafana.cavv.dominio`, folder **Monitoreo CAVV** con los 2 dashboards cargados por provisioning:
 
-![grafana login](capturas/grafana-login.jpg)
+![grafana](capturas/grafana-dominio.png)
 
 ### Data sources provisionados
 
 Prometheus y Loki, creados por provisioning:
 
-![grafana datasources](capturas/grafana-datasources.jpg)
+![grafana datasources](capturas/grafana-datasources.png)
 
 Al abrir uno, Grafana avisa que fue agregado por configuracion y no se puede editar desde la interfaz:
 
-![grafana datasource provisionado](capturas/grafana-datasource-provisionado.jpg)
+![grafana datasource provisionado](capturas/grafana-datasource-provisionado.png)
 
 ### Dashboard de metricas del cluster
 
 Resumen del nodo y CPU/memoria por namespace:
 
-![dashboard metricas](capturas/grafana-dashboard-metricas.jpg)
+![dashboard metricas](capturas/grafana-dashboard-metricas.png)
 
-CPU/memoria por pod y estado de los pods de `parcial-cavv`:
+CPU/memoria por pod y estado de los pods del namespace elegido en la variable (aqui `monitoring-cavv`, el del stack):
 
-![dashboard metricas pods](capturas/grafana-dashboard-metricas-pods.jpg)
+![dashboard metricas pods](capturas/grafana-dashboard-metricas-pods.png)
 
 ### Dashboard de logs de las 4 apps
 
 Lineas por app y logs de nginx y whoami:
 
-![dashboard logs](capturas/grafana-dashboard-logs.jpg)
+![dashboard logs](capturas/grafana-dashboard-logs.png)
 
 Logs de podinfo y juego2048:
 
-![dashboard logs 2](capturas/grafana-dashboard-logs-2.jpg)
+![dashboard logs 2](capturas/grafana-dashboard-logs-2.png)
 
 Access log de Traefik con las peticiones a cada app:
 
-![dashboard logs traefik](capturas/grafana-dashboard-logs-traefik.jpg)
+![dashboard logs traefik](capturas/grafana-dashboard-logs-traefik.png)
 
 ## Problemas / troubleshooting
 
