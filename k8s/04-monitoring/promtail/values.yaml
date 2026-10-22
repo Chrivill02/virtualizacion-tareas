@@ -1,0 +1,74 @@
+# Chart: grafana/promtail 6.17.1
+# Promtail corre como DaemonSet (un pod por nodo). Lee los logs de los contenedores
+# que el kubelet deja en /var/log/pods del nodo y los manda a Loki.
+
+daemonset:
+  enabled: true
+
+podAnnotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/port: "3101"
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    memory: 256Mi
+
+config:
+  clients:
+    - url: http://loki.monitoring-cavv.svc:3100/loki/api/v1/push
+
+  snippets:
+    # minikube usa containerd, los logs vienen en formato CRI
+    pipelineStages:
+      - cri: {}
+
+    # Un solo job: descubre todos los pods del cluster con la API de k8s y les pone etiquetas.
+    # Asi entran los logs de las 4 apps de parcial-cavv, de Traefik y del resto del cluster.
+    scrapeConfigs: |
+      - job_name: kubernetes-pods
+        pipeline_stages:
+          {{- toYaml .Values.config.snippets.pipelineStages | nindent 4 }}
+        kubernetes_sd_configs:
+          - role: pod
+        relabel_configs:
+          # Solo pods que ya estan corriendo en un nodo
+          - source_labels: [__meta_kubernetes_pod_node_name]
+            regex: ""
+            action: drop
+          # Etiqueta app: label "app" del pod (nginx, whoami, podinfo, juego2048, traefik...)
+          # o app.kubernetes.io/name si no tiene
+          - source_labels:
+              - __meta_kubernetes_pod_label_app
+              - __meta_kubernetes_pod_label_app_kubernetes_io_name
+            regex: ^;*([^;]+)(;.*)?$
+            target_label: app
+          - source_labels: [__meta_kubernetes_namespace]
+            target_label: namespace
+          - source_labels: [__meta_kubernetes_pod_name]
+            target_label: pod
+          - source_labels: [__meta_kubernetes_pod_container_name]
+            target_label: container
+          - source_labels: [__meta_kubernetes_pod_node_name]
+            target_label: node_name
+          - source_labels: [namespace, app]
+            separator: /
+            target_label: job
+          # Archivo del log en el nodo: /var/log/pods/<ns>_<pod>_<uid>/<contenedor>/*.log
+          - source_labels:
+              - __meta_kubernetes_pod_uid
+              - __meta_kubernetes_pod_container_name
+            separator: /
+            replacement: /var/log/pods/*$1/*.log
+            target_label: __path__
+          # Los pods estaticos (apiserver, etcd...) usan el hash de su config en vez del uid
+          - source_labels:
+              - __meta_kubernetes_pod_annotationpresent_kubernetes_io_config_hash
+              - __meta_kubernetes_pod_annotation_kubernetes_io_config_hash
+              - __meta_kubernetes_pod_container_name
+            separator: /
+            regex: true/(.*)
+            replacement: /var/log/pods/*$1/*.log
+            target_label: __path__

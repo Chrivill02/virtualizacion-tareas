@@ -1,0 +1,78 @@
+# Chart: grafana-community/loki 19.0.3
+# Loki en modo Monolithic (un solo pod con todos los componentes) guardando los
+# chunks e indices en el filesystem (PVC). Es suficiente para un cluster de minikube.
+
+deploymentMode: Monolithic
+
+loki:
+  # Sin multi-tenant: Promtail y Grafana no necesitan mandar el header X-Scope-OrgID
+  auth_enabled: false
+
+  commonConfig:
+    replication_factor: 1
+
+  storage:
+    type: filesystem
+
+  schemaConfig:
+    configs:
+      - from: "2024-01-01"
+        store: tsdb
+        object_store: filesystem
+        schema: v13
+        index:
+          prefix: loki_index_
+          period: 24h
+
+  limits_config:
+    retention_period: 168h
+    volume_enabled: true
+
+  compactor:
+    retention_enabled: true
+    delete_request_store: filesystem
+
+  podAnnotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "3100"
+
+singleBinary:
+  replicas: 1
+  persistence:
+    enabled: true
+    size: 4Gi
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      memory: 1Gi
+
+# Promtail y Grafana hablan directo con el Service "loki" (puerto 3100), no hace falta el nginx gateway
+gateway:
+  enabled: false
+
+# Componentes de los otros modos de despliegue en 0
+write:
+  replicas: 0
+read:
+  replicas: 0
+backend:
+  replicas: 0
+
+# Caches (memcached), canary y tests desactivados para ahorrar memoria
+chunksCache:
+  enabled: false
+resultsCache:
+  enabled: false
+lokiCanary:
+  enabled: false
+test:
+  enabled: false
+ruler:
+  enabled: false
+
+# Sidecar que carga reglas de alertas desde ConfigMaps, no se usa (ruler desactivado)
+sidecar:
+  rules:
+    enabled: false
