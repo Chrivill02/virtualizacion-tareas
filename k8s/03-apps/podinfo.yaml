@@ -23,6 +23,9 @@ spec:
               value: "Parcial 2 - parcial-cavv"
             - name: PODINFO_UI_COLOR
               value: "#2c3e50"
+            # En debug escribe una linea por cada peticion (para verlas en Loki)
+            - name: PODINFO_LEVEL
+              value: debug
           ports:
             - name: http
               containerPort: 9898
