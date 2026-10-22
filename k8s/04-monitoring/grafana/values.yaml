@@ -1,0 +1,73 @@
+# Chart: grafana-community/grafana 14.0.1
+# Data sources y dashboards por provisioning (archivos que Grafana lee al arrancar),
+# nada se configura a mano desde la interfaz.
+
+adminUser: admin
+# La contrasena la genera el chart en el Secret "grafana" (ver README)
+
+grafana.ini:
+  server:
+    domain: grafana.parcial.dominio
+    root_url: http://grafana.parcial.dominio
+  analytics:
+    check_for_updates: false
+    reporting_enabled: false
+
+podAnnotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/port: "3000"
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 128Mi
+  limits:
+    memory: 512Mi
+
+# Provisioning de data sources -> /etc/grafana/provisioning/datasources/datasources.yaml
+# Los uid fijos son los que usan los dashboards en el JSON
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    deleteDatasources:
+      - name: Prometheus
+        orgId: 1
+      - name: Loki
+        orgId: 1
+    datasources:
+      - name: Prometheus
+        uid: prometheus
+        type: prometheus
+        access: proxy
+        url: http://prometheus-server.monitoring-cavv.svc
+        isDefault: true
+        editable: false
+        jsonData:
+          timeInterval: 30s
+      - name: Loki
+        uid: loki
+        type: loki
+        access: proxy
+        url: http://loki.monitoring-cavv.svc:3100
+        editable: false
+        jsonData:
+          maxLines: 1000
+
+# Provisioning de dashboards -> Grafana carga todos los JSON de la carpeta del provider
+dashboardProviders:
+  dashboardproviders.yaml:
+    apiVersion: 1
+    providers:
+      - name: cavv
+        orgId: 1
+        folder: Monitoreo CAVV
+        type: file
+        disableDeletion: true
+        editable: false
+        options:
+          path: /var/lib/grafana/dashboards/cavv
+
+# El ConfigMap "grafana-dashboards-cavv" (k8s/04-monitoring/grafana/dashboards) se monta
+# en la carpeta del provider "cavv"
+dashboardsConfigMaps:
+  cavv: grafana-dashboards-cavv

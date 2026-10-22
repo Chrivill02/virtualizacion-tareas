@@ -1,0 +1,13 @@
+# Genera el ConfigMap con los JSON de los dashboards que monta Grafana
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: monitoring-cavv
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+configMapGenerator:
+  - name: grafana-dashboards-cavv
+    files:
+      - cluster-metricas.json
+      - logs-parcial-cavv.json
