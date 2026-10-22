@@ -18,6 +18,13 @@ spec:
       containers:
         - name: juego2048
           image: public.ecr.aws/l6m2t8p7/docker-2048:latest
+          # La imagen escribe los logs de nginx en archivos dentro del contenedor.
+          # Se mandan a stdout/stderr para que el kubelet los guarde y Promtail los lea.
+          command: ["/bin/sh", "-c"]
+          args:
+            - ln -sf /dev/stdout /var/log/nginx/access.log &&
+              ln -sf /dev/stderr /var/log/nginx/error.log &&
+              exec nginx -g 'daemon off;'
           ports:
             - name: http
               containerPort: 80
