@@ -13,16 +13,23 @@ grafana.ini:
     check_for_updates: false
     reporting_enabled: false
 
+# Base de datos SQLite de Grafana (usuarios, sesiones) en un PVC para no perderla al reiniciar
+persistence:
+  enabled: true
+  size: 1Gi
+
 podAnnotations:
   prometheus.io/scrape: "true"
   prometheus.io/port: "3000"
 
+# El chart pone GOMEMLIMIT al 90% del limite. Con 512Mi Grafana 13 se quedaba sin
+# margen, el garbage collector de Go corria sin parar (1.5 cores) y no respondia.
 resources:
   requests:
-    cpu: 50m
-    memory: 128Mi
+    cpu: 100m
+    memory: 256Mi
   limits:
-    memory: 512Mi
+    memory: 1Gi
 
 # Provisioning de data sources -> /etc/grafana/provisioning/datasources/datasources.yaml
 # Los uid fijos son los que usan los dashboards en el JSON
