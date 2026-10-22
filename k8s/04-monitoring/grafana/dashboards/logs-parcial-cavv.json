@@ -85,7 +85,7 @@
           },
           "queryType": "range",
           "legendFormat": "{{app}}",
-          "expr": "sum by (app) (count_over_time({namespace=\"parcial-cavv\", app=~\"$app\"} |~ \"(?i)$buscar\" [1m]))"
+          "expr": "sum by (app) (count_over_time({namespace=\"parcial-cavv\", app=~\"$app\"} |~ \"(?i)$buscar\" [$__auto]))"
         }
       ],
       "options": {
@@ -137,17 +137,18 @@
             "type": "loki",
             "uid": "loki"
           },
-          "queryType": "instant",
+          "queryType": "range",
           "legendFormat": "{{app}}",
-          "expr": "sum by (app) (count_over_time({namespace=\"parcial-cavv\", app=~\"$app\"} |~ \"(?i)$buscar\" [$__range]))"
+          "expr": "sum by (app) (count_over_time({namespace=\"parcial-cavv\", app=~\"$app\"} |~ \"(?i)$buscar\" [$__auto]))"
         }
       ],
       "options": {
         "orientation": "horizontal",
         "displayMode": "gradient",
+        "showUnfilled": true,
         "reduceOptions": {
           "calcs": [
-            "lastNotNull"
+            "sum"
           ],
           "fields": "",
           "values": false
