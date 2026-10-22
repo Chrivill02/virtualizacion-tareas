@@ -363,7 +363,7 @@
             "type": "loki",
             "uid": "loki"
           },
-          "expr": "{namespace=\"traefik\"} |~ \"(?i)$buscar\"",
+          "expr": "{namespace=\"traefik\"} |= \"parcial-cavv\" |~ \"(?i)$buscar\"",
           "queryType": "range"
         }
       ],
