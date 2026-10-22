@@ -1,0 +1,89 @@
+# Chart: prometheus-community/prometheus 29.37.1
+# Instala el servidor de Prometheus + kube-state-metrics (estado de los objetos de k8s)
+# + node-exporter (CPU/memoria/disco del nodo). Las metricas de CPU/memoria por contenedor
+# salen de cAdvisor, que ya viene en el kubelet (job kubernetes-nodes-cadvisor).
+
+server:
+  # Prometheus escucha en / (Traefik lo expone en prometheus.parcial.dominio)
+  prefixURL: ""
+  baseURL: http://prometheus.parcial.dominio
+
+  global:
+    scrape_interval: 30s
+    evaluation_interval: 30s
+
+  retention: 7d
+
+  persistentVolume:
+    enabled: true
+    size: 4Gi
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      memory: 1Gi
+
+# No se usan en esta actividad
+alertmanager:
+  enabled: false
+prometheus-pushgateway:
+  enabled: false
+
+kube-state-metrics:
+  enabled: true
+
+prometheus-node-exporter:
+  enabled: true
+  rbac:
+    pspEnabled: false
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+
+# Jobs que trae el chart. Se dejan los del cluster (apiserver, nodos, cadvisor,
+# endpoints y pods con la anotacion prometheus.io/scrape) y se quitan los que
+# dependen de pushgateway/blackbox, que no estan instalados.
+scrapeConfigs:
+  prometheus-pushgateway:
+    enabled: false
+  kubernetes-services:
+    enabled: false
+  # MetalLB tiene la anotacion prometheus.io/scrape pero sirve /metrics por HTTPS con token,
+  # asi que se saca de este job y se recolecta en el job "metallb" de abajo
+  kubernetes-pods:
+    pre_relabel_configs: |
+      - source_labels: [__meta_kubernetes_namespace]
+        action: drop
+        regex: metallb-system
+
+# Job extra para Traefik: expone /metrics en el entrypoint "traefik" (puerto 8080)
+extraScrapeConfigs: |
+  - job_name: traefik
+    static_configs:
+      - targets:
+          - traefik-dashboard.traefik.svc:8080
+        labels:
+          namespace: traefik
+
+  # MetalLB (controller y speaker): HTTPS en el puerto 9120, autenticado con el token
+  # del ServiceAccount de Prometheus (el chart ya le da permiso a /metrics)
+  - job_name: metallb
+    scheme: https
+    tls_config:
+      insecure_skip_verify: true
+    bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+    kubernetes_sd_configs:
+      - role: pod
+        namespaces:
+          names: [metallb-system]
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_pod_container_port_number]
+        action: keep
+        regex: "9120"
+      - source_labels: [__meta_kubernetes_namespace]
+        target_label: namespace
+      - source_labels: [__meta_kubernetes_pod_name]
+        target_label: pod
+      - source_labels: [__meta_kubernetes_pod_label_component]
+        target_label: component

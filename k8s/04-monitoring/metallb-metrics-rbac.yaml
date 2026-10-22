@@ -1,0 +1,30 @@
+# MetalLB protege su /metrics (puerto 9120, HTTPS): valida el token de quien pregunta
+# con TokenReview y revisa sus permisos con SubjectAccessReview. El manifiesto
+# metallb-native no le da esos permisos y responde 500, por eso Prometheus lo veia DOWN.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: metallb-metrics-auth
+rules:
+  - apiGroups: ["authentication.k8s.io"]
+    resources: ["tokenreviews"]
+    verbs: ["create"]
+  - apiGroups: ["authorization.k8s.io"]
+    resources: ["subjectaccessreviews"]
+    verbs: ["create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: metallb-metrics-auth
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: metallb-metrics-auth
+subjects:
+  - kind: ServiceAccount
+    name: controller
+    namespace: metallb-system
+  - kind: ServiceAccount
+    name: speaker
+    namespace: metallb-system

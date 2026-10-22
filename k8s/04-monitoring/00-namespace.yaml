@@ -1,0 +1,5 @@
+# Namespace unico para todo el stack de monitoreo (monitoring- + mis iniciales)
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: monitoring-cavv
