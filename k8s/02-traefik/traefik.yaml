@@ -79,6 +79,8 @@ spec:
             - --api.dashboard=true
             - --api.insecure=true
             - --ping=true
+            # Metricas para Prometheus en :8080/metrics (entrypoint traefik)
+            - --metrics.prometheus=true
             - --log.level=INFO
             - --accesslog=true
           ports:
